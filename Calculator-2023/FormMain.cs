@@ -48,9 +48,14 @@ namespace Calculator_2023
             { new BtnStruct('\u00B1',SymbolType.PlusMinusSign), new BtnStruct('0',SymbolType.Number,true), new BtnStruct(',',SymbolType.DecimalPoint), new BtnStruct('=',SymbolType.Operator) },
         };
 
+        float lblResultBaseFontSize;
+        const int lblResultWidthMargin = 24;
+        const int lblResultMaxDigit = 25;
+
         public FormMain()
         {
             InitializeComponent();
+            lblResultBaseFontSize = lblResult.Font.Size;
         }
 
         private void FormMain_Load(object sender, EventArgs e)
@@ -140,18 +145,12 @@ namespace Calculator_2023
                 if (lblResult.Text.IndexOf(",") == lblResult.Text.Length - 1) stOut += ",";
                 lblResult.Text = stOut;
             }   
-            if (lblResult.Text.Length > 20) lblResult.Text = lblResult.Text.Substring(0, 20);
-            if (lblResult.Text.Length > 11)
-            {
-                int textWidth = TextRenderer.MeasureText(lblResult.Text, lblResult.Font).Width;
-                // float newSize = lblResult.Font.Size * (float)0.96;
-                float newSize = lblResult.Font.Size * ((float)320 / textWidth);
-                lblResult.Font = new Font("Segoe UI", newSize, FontStyle.Regular);
-            }
-            else
-            {
-                lblResult.Font = new Font("Segoe UI", 36, FontStyle.Regular);
-            }
+            if (lblResult.Text.Length > lblResultMaxDigit) lblResult.Text = lblResult.Text.Substring(0, lblResultMaxDigit);
+
+            int textWidth = TextRenderer.MeasureText(lblResult.Text, lblResult.Font).Width;
+            float newSize = lblResult.Font.Size * (((float)lblResult.Size.Width - lblResultWidthMargin) / textWidth);
+            if (newSize > lblResultBaseFontSize) newSize = lblResultBaseFontSize;
+            lblResult.Font = new Font("Segoe UI", newSize, FontStyle.Regular);
         }
     }
 }
