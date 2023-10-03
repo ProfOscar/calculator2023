@@ -108,7 +108,14 @@ namespace Calculator_2023
                     lblResult.Text += clickedButton.Text;
                     break;
                 case SymbolType.Operator:
-                    ManageOperator(clickedButtonStruct);
+                    if (lastButtonClicked.Type == SymbolType.Operator && clickedButtonStruct.Content != '=')
+                    {
+                        lastOperator = clickedButtonStruct.Content;
+                    }
+                    else
+                    {
+                        ManageOperator(clickedButtonStruct);
+                    }
                     break;
                 case SymbolType.DecimalPoint:
                     if (lblResult.Text.IndexOf(",") == -1)
@@ -122,9 +129,12 @@ namespace Calculator_2023
                             lblResult.Text = lblResult.Text.Substring(1);
                     break;
                 case SymbolType.Backspace:
-                    lblResult.Text = lblResult.Text.Substring(0, lblResult.Text.Length - 1);
-                    if (lblResult.Text.Length == 0 || lblResult.Text == "-0")
-                        lblResult.Text = "0";
+                    if (lastButtonClicked.Type != SymbolType.Operator)
+                    {
+                        lblResult.Text = lblResult.Text.Substring(0, lblResult.Text.Length - 1);
+                        if (lblResult.Text.Length == 0 || lblResult.Text == "-0")
+                            lblResult.Text = "0";
+                    }
                     break;
                 case SymbolType.ClearAll:
                     lblResult.Text = "0";
@@ -134,7 +144,8 @@ namespace Calculator_2023
                 default:
                     break;
             }
-            lastButtonClicked = clickedButtonStruct;
+            if (clickedButtonStruct.Type != SymbolType.Backspace)
+                lastButtonClicked = clickedButtonStruct;
         }
 
         private void ManageOperator(BtnStruct clickedButtonStruct)
@@ -142,11 +153,11 @@ namespace Calculator_2023
             if (lastOperator == ' ')
             {
                 operand1 = decimal.Parse(lblResult.Text);
-                lastOperator = clickedButtonStruct.Content;
+                if (clickedButtonStruct.Content != '=') lastOperator = clickedButtonStruct.Content;
             }
             else
             {
-                operand2 = decimal.Parse(lblResult.Text);
+                if (lastButtonClicked.Content != '=') operand2 = decimal.Parse(lblResult.Text);
                 switch (lastOperator)
                 {
                     case '+':
@@ -165,7 +176,11 @@ namespace Calculator_2023
                         break;
                 }
                 operand1 = result;
-                lastOperator = clickedButtonStruct.Content;
+                if (clickedButtonStruct.Content != '=')
+                {
+                    lastOperator = clickedButtonStruct.Content;
+                    if (lastButtonClicked.Content == '=') operand2 = 0;
+                }
                 lblResult.Text = result.ToString();
             }
         }
