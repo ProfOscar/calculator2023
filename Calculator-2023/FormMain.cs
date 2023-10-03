@@ -133,6 +133,11 @@ namespace Calculator_2023
 
         private void lblResult_TextChanged(object sender, EventArgs e)
         {
+            if (lblResult.Text == "-")
+            {
+                lblResult.Text = "0";
+                return;
+            }
             if (lblResult.Text.Length > 0)
             {
                 decimal num = decimal.Parse(lblResult.Text); string stOut = "";
