@@ -17,6 +17,7 @@ namespace Calculator_2023
         {
             Number,
             Operator,
+            SpecialOperator,
             DecimalPoint,
             PlusMinusSign,
             Backspace,
@@ -41,7 +42,7 @@ namespace Calculator_2023
         private BtnStruct[,] buttons =
         {
             { new BtnStruct('%'), new BtnStruct('\u0152', SymbolType.ClearEntry), new BtnStruct('C', SymbolType.ClearAll), new BtnStruct('\u232B', SymbolType.Backspace) },
-            { new BtnStruct('\u215F'), new BtnStruct('\u00B2'), new BtnStruct('\u221A'), new BtnStruct('\u00F7',SymbolType.Operator) },
+            { new BtnStruct('\u215F',SymbolType.SpecialOperator), new BtnStruct('\u00B2'), new BtnStruct('\u221A'), new BtnStruct('\u00F7',SymbolType.Operator) },
             { new BtnStruct('7',SymbolType.Number,true), new BtnStruct('8',SymbolType.Number,true), new BtnStruct('9',SymbolType.Number,true), new BtnStruct('\u00D7',SymbolType.Operator) },
             { new BtnStruct('4',SymbolType.Number,true), new BtnStruct('5',SymbolType.Number,true), new BtnStruct('6',SymbolType.Number,true), new BtnStruct('-',SymbolType.Operator) },
             { new BtnStruct('1',SymbolType.Number,true), new BtnStruct('2',SymbolType.Number,true), new BtnStruct('3',SymbolType.Number,true), new BtnStruct('+',SymbolType.Operator) },
@@ -100,12 +101,15 @@ namespace Calculator_2023
         {
             Button clickedButton = (Button)sender;
             BtnStruct clickedButtonStruct = (BtnStruct)clickedButton.Tag;
-            
+
             switch (clickedButtonStruct.Type)
             {
                 case SymbolType.Number:
                     if (lblResult.Text == "0" || lastButtonClicked.Type == SymbolType.Operator) lblResult.Text = "";
                     lblResult.Text += clickedButton.Text;
+                    break;
+                case SymbolType.SpecialOperator:
+                    ManageSpecialOperator(clickedButtonStruct);
                     break;
                 case SymbolType.Operator:
                     if (lastButtonClicked.Type == SymbolType.Operator && clickedButtonStruct.Content != '=')
@@ -137,11 +141,11 @@ namespace Calculator_2023
                     }
                     break;
                 case SymbolType.ClearAll:
-                    operand1 = 0;
-                    operand2 = 0;
-                    result = 0;
-                    lastOperator = ' ';
-                    lblResult.Text = "0";
+                    ClearAll();
+                    break;
+                case SymbolType.ClearEntry:
+                    if (lastButtonClicked.Content == '=') ClearAll();
+                    else lblResult.Text = "0";
                     break;
                 case SymbolType.Undefined:
                     break;
@@ -150,6 +154,29 @@ namespace Calculator_2023
             }
             if (clickedButtonStruct.Type != SymbolType.Backspace)
                 lastButtonClicked = clickedButtonStruct;
+        }
+
+        private void ClearAll()
+        {
+            operand1 = 0;
+            operand2 = 0;
+            result = 0;
+            lastOperator = ' ';
+            lblResult.Text = "0";
+        }
+
+        private void ManageSpecialOperator(BtnStruct clickedButtonStruct)
+        {
+            operand2 = decimal.Parse(lblResult.Text);
+            switch (clickedButtonStruct.Content)
+            {
+                case '\u215F':   // 1/x
+                    result = 1 / operand2;
+                    break;
+                default:
+                    break;
+            }
+            lblResult.Text = result.ToString();
         }
 
         private void ManageOperator(BtnStruct clickedButtonStruct)
@@ -207,7 +234,7 @@ namespace Calculator_2023
                 stOut = num.ToString("N", nfi);
                 if (lblResult.Text.IndexOf(",") == lblResult.Text.Length - 1) stOut += ",";
                 lblResult.Text = stOut;
-            }   
+            }
             if (lblResult.Text.Length > lblResultMaxDigit) lblResult.Text = lblResult.Text.Substring(0, lblResultMaxDigit);
 
             int textWidth = TextRenderer.MeasureText(lblResult.Text, lblResult.Font).Width;
