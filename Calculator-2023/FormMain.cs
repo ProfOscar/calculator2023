@@ -41,8 +41,8 @@ namespace Calculator_2023
 
         private BtnStruct[,] buttons =
         {
-            { new BtnStruct('%'), new BtnStruct('\u0152', SymbolType.ClearEntry), new BtnStruct('C', SymbolType.ClearAll), new BtnStruct('\u232B', SymbolType.Backspace) },
-            { new BtnStruct('\u215F',SymbolType.SpecialOperator), new BtnStruct('\u00B2'), new BtnStruct('\u221A'), new BtnStruct('\u00F7',SymbolType.Operator) },
+            { new BtnStruct('%',SymbolType.SpecialOperator), new BtnStruct('\u0152', SymbolType.ClearEntry), new BtnStruct('C', SymbolType.ClearAll), new BtnStruct('\u232B', SymbolType.Backspace) },
+            { new BtnStruct('\u215F',SymbolType.SpecialOperator), new BtnStruct('\u00B2',SymbolType.SpecialOperator), new BtnStruct('\u221A',SymbolType.SpecialOperator), new BtnStruct('\u00F7',SymbolType.Operator) },
             { new BtnStruct('7',SymbolType.Number,true), new BtnStruct('8',SymbolType.Number,true), new BtnStruct('9',SymbolType.Number,true), new BtnStruct('\u00D7',SymbolType.Operator) },
             { new BtnStruct('4',SymbolType.Number,true), new BtnStruct('5',SymbolType.Number,true), new BtnStruct('6',SymbolType.Number,true), new BtnStruct('-',SymbolType.Operator) },
             { new BtnStruct('1',SymbolType.Number,true), new BtnStruct('2',SymbolType.Number,true), new BtnStruct('3',SymbolType.Number,true), new BtnStruct('+',SymbolType.Operator) },
@@ -131,9 +131,13 @@ namespace Calculator_2023
                             lblResult.Text = "-" + lblResult.Text;
                         else
                             lblResult.Text = lblResult.Text.Substring(1);
+                    if (lastButtonClicked.Type == SymbolType.Operator)
+                    {
+                        operand1 = -operand1;
+                    }
                     break;
                 case SymbolType.Backspace:
-                    if (lastButtonClicked.Type != SymbolType.Operator)
+                    if (lastButtonClicked.Type != SymbolType.Operator && lastButtonClicked.Type != SymbolType.SpecialOperator)
                     {
                         lblResult.Text = lblResult.Text.Substring(0, lblResult.Text.Length - 1);
                         if (lblResult.Text.Length == 0 || lblResult.Text == "-0")
@@ -152,7 +156,7 @@ namespace Calculator_2023
                 default:
                     break;
             }
-            if (clickedButtonStruct.Type != SymbolType.Backspace)
+            if (clickedButtonStruct.Type != SymbolType.Backspace && clickedButtonStruct.Type != SymbolType.PlusMinusSign)
                 lastButtonClicked = clickedButtonStruct;
         }
 
@@ -170,8 +174,17 @@ namespace Calculator_2023
             operand2 = decimal.Parse(lblResult.Text);
             switch (clickedButtonStruct.Content)
             {
-                case '\u215F':   // 1/x
+                case '%':
+                    result = operand1 * operand2 / 100;
+                    break;
+                case '\u215F':  // 1/x
                     result = 1 / operand2;
+                    break;
+                case '\u00B2':  // x^2
+                    result = operand2 * operand2;
+                    break;
+                case '\u221A':  // sqr(x)
+                    result = (decimal)Math.Sqrt((double)operand2);
                     break;
                 default:
                     break;
