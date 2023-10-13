@@ -61,6 +61,7 @@ namespace Calculator_2023
         {
             InitializeComponent();
             lblResultBaseFontSize = lblResult.Font.Size;
+            lblExpression.Text = "";
         }
 
         private void FormMain_Load(object sender, EventArgs e)
@@ -105,6 +106,7 @@ namespace Calculator_2023
             switch (clickedButtonStruct.Type)
             {
                 case SymbolType.Number:
+                    if (lastButtonClicked.Content == '=') ClearAll();
                     if (lblResult.Text == "0" || lastButtonClicked.Type == SymbolType.Operator) lblResult.Text = "";
                     lblResult.Text += clickedButton.Text;
                     break;
@@ -120,6 +122,7 @@ namespace Calculator_2023
                     {
                         ManageOperator(clickedButtonStruct);
                     }
+                    WriteExpression(clickedButtonStruct);
                     break;
                 case SymbolType.DecimalPoint:
                     if (lblResult.Text.IndexOf(",") == -1)
@@ -167,6 +170,7 @@ namespace Calculator_2023
             result = 0;
             lastOperator = ' ';
             lblResult.Text = "0";
+            lblExpression.Text = "";
         }
 
         private void ManageSpecialOperator(BtnStruct clickedButtonStruct)
@@ -190,6 +194,7 @@ namespace Calculator_2023
                     break;
             }
             lblResult.Text = result.ToString();
+            lblExpression.Text = "";    // non ancora gestito
         }
 
         private void ManageOperator(BtnStruct clickedButtonStruct)
@@ -226,6 +231,18 @@ namespace Calculator_2023
                     if (lastButtonClicked.Content == '=') operand2 = 0;
                 }
                 lblResult.Text = result.ToString();
+            }
+        }
+
+        private void WriteExpression(BtnStruct clickedButtonStruct)
+        {
+            if (clickedButtonStruct.Content == '=')
+            {
+                lblExpression.Text += operand2.ToString() + "=";
+            }
+            else
+            {
+                lblExpression.Text = operand1.ToString() + clickedButtonStruct.Content;
             }
         }
 
